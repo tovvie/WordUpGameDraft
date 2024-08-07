@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WordUp! - Word Building Game</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>WordUp!</h1>
+        <p>Build words starting with the last letter of the previous word.</p>
+        <div id="gameArea">
+            <div id="wordList">
+                <h2>Words:</h2>
+                <ul id="words"></ul>
+            </div>
+            <input type="text" id="wordInput" placeholder="Enter a word">
+            <button id="submitWord">Submit</button>
+            <p id="error" class="error"></p>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
