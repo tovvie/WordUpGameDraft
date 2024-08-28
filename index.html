@@ -1,25 +1,38 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+    <!-- Meta charset for encoding characters-->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!--Title of Webpage in browser tab-->
     <title>WordUp! - Word Building Game</title>
     <link rel="stylesheet" href="styles.css">
 </head>
+
+<!--Main page content-->
 <body>
     <div class="container">
         <h1>WordUp!</h1>
         <p>Build words starting with the last letter of the previous word.</p>
+        <!-- Game interaction-->
         <div id="gameArea">
             <div id="wordList">
                 <h2>Words:</h2>
                 <ul id="words"></ul>
             </div>
+            <!-- Input area for new words-->
             <input type="text" id="wordInput" placeholder="Enter a word">
             <button id="submitWord">Submit</button>
             <p id="error" class="error"></p>
         </div>
+        <!-- Display Leaderboard-->
+        <div id="leaderboard">
+            <h2>Leaderboard</h2>
+            <ol id="leaderboardList"></ol>
+        </div>
     </div>
+    <!-- Javascript link-->
     <script src="script.js"></script>
 </body>
 </html>
