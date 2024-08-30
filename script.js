@@ -1,88 +1,112 @@
 document.addEventListener('DOMContentLoaded', () => {
-// References to HTML elements
     const wordInput = document.getElementById('wordInput');
     const submitWord = document.getElementById('submitWord');
     const wordsList = document.getElementById('words');
     const errorDisplay = document.getElementById('error');
     const leaderboardList = document.getElementById('leaderboardList');
+    const container = document.querySelector('.container');
 
-    let words = []; // Array to store words used
-    const leaderboard = JSON.parse(localStorage.getItem('leaderboard') || '{}'); // Retrieve Leaderboard
-    const currentUser = localStorage.getItem('currentUser'); // Retrieve username
+    submitWord.classList.add('mainButton');
+
+    const restartButton = document.createElement('button');
+    restartButton.id = 'restartButton';
+    restartButton.classList.add('mainButton');
+    restartButton.textContent = 'Restart Game';
+    restartButton.style.display = 'none';
+    container.appendChild(restartButton);
+
+    let words = [];
+    let gameOver = false;
+    const leaderboard = JSON.parse(localStorage.getItem('leaderboard') || '{}');
+    const currentUser = localStorage.getItem('currentUser');
 
     if (!currentUser) {
-        window.location.href = 'login.html'; // Redirect to login if not authenticated
+        window.location.href = 'login.html';
     }
-// Submit button event listener
+
     submitWord.addEventListener('click', () => {
+        if (gameOver) return;
+
         const newWord = wordInput.value.trim().toLowerCase();
-        
-        // Check if input is empty
+
         if (!newWord) {
             errorDisplay.textContent = 'Please enter a word.';
             return;
         }
-        
-        // Check if the word follows the rules
+
         if (words.length > 0) {
             const lastWord = words[words.length - 1];
-            const lastLetter = lastWord.slice(-1); // Last letter of the last word
-            
-            // Error message
+            const lastLetter = lastWord.slice(-1);
+
             if (newWord[0] !== lastLetter) {
                 errorDisplay.textContent = `Word must start with '${lastLetter}'.`;
+                endGame();
                 return;
             }
         }
-        // Check for duplicate words
+
         if (words.includes(newWord)) {
             errorDisplay.textContent = 'Word already used. Try a different one.';
+            endGame();
             return;
         }
 
-        // Add new word to list
         words.push(newWord);
-        updateWordList(); // Updates displayed list
-        updateLeaderboard(newWord); // Updates leaderboard
-        wordInput.value = ''; // Clears input field
-        errorDisplay.textContent = ''; // Clears any error messages
+        updateWordList();
+        updateLeaderboard(newWord);
+        wordInput.value = '';
+        errorDisplay.textContent = '';
     });
 
-    // Update displayed word list
     function updateWordList() {
-        wordsList.innerHTML = ''; // Clears current list
+        wordsList.innerHTML = '';
         words.forEach(word => {
-            const li = document.createElement('li'); // Creates new list item
-            li.textContent = word; // Set the text to the word
-            wordsList.appendChild(li); // Add list item to the unordered list
+            const li = document.createElement('li');
+            li.textContent = word;
+            wordsList.appendChild(li);
         });
     }
 
-    // Update leaderboard
     function updateLeaderboard(word) {
-        const points = word.length; // Calculates points based on word length
+        const points = word.length;
 
-        // Update the current user's total points
         let userPoints = parseInt(localStorage.getItem(currentUser) || '0', 10);
-        userPoints += points; // Add points to new word
-        localStorage.setItem(currentUser, userPoints); // Store points
+        userPoints += points;
+        localStorage.setItem(currentUser, userPoints);
 
-        // Update leaderboard
         leaderboard[currentUser] = userPoints;
         localStorage.setItem('leaderboard', JSON.stringify(leaderboard));
 
-        // Sort leaderboard by points in order
         const sortedLeaderboard = Object.entries(leaderboard)
             .sort((a, b) => b[1] - a[1])
             .map(entry => `${entry[0]}: ${entry[1]} points`);
 
-        // Update displayed leaderboard
-        leaderboardList.innerHTML = ''; // Clears current leaderboard
+        leaderboardList.innerHTML = '';
         sortedLeaderboard.forEach(entry => {
             const li = document.createElement('li');
             li.textContent = entry;
             leaderboardList.appendChild(li);
         });
     }
-});
 
+    function endGame() {
+        gameOver = true;
+        errorDisplay.textContent += ' Game Over!';
+        wordInput.disabled = true;
+        submitWord.disabled = true;
+
+        restartButton.style.display = 'block';
+    }
+
+    restartButton.addEventListener('click', () => {
+        words = [];
+        gameOver = false;
+        errorDisplay.textContent = '';
+        wordInput.disabled = false;
+        submitWord.disabled = false;
+        wordInput.value = '';
+        updateWordList();
+
+        restartButton.style.display = 'none';
+    });
+});
