@@ -26,10 +26,10 @@ body {
     margin-right: 10px;
 }
 
-#submitWord {
+/* #submitWord {
     padding: 10px;
     font-size: 16px;
-}
+} */
 
 .error {
     color: red;
@@ -57,3 +57,22 @@ body {
     padding: 8px;
     font-size: 16px;
 }  
+.mainButton {
+    display: inline-block;
+    padding: 10px 20px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    font-size: 18px;
+    font-family: Garamond, serif;
+    border: 1px solid black;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s, box-shadow 0.3s;
+    box-shadow: 3px rgba(0, 0, 0, 0.1);
+    background-color: #0E30E1ff;
+    color: white;
+}
+
+.mainButton:hover {
+    background-color: rgb(16, 16, 168);
+}

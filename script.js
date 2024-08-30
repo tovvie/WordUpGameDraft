@@ -14,7 +14,26 @@ document.addEventListener('DOMContentLoaded', () => {
         window.location.href = 'login.html'; // Redirect to login if not authenticated
     }
 // Submit button event listener
+    
+    // This makes a variable of the container in the script
+    const container = document.querySelector('.container');
+
+    // this is to make submit button the same class as restart button for CSS
+    submitWord.classList.add('mainButton');
+    
+    // The Restart button is made in the script to avoid using IDs
+    const restartButton = document.createElement('button');
+    restartButton.id = 'restartButton';
+    restartButton.classList.add('mainButton');
+    restartButton.textContent = 'Restart Game';
+    restartButton.style.display = 'none'; // Hidden to begin with
+    container.appendChild(restartButton); // Adds it to the container
+
+    let gameOver = false;
+
     submitWord.addEventListener('click', () => {
+        if (gameOver) return;
+
         const newWord = wordInput.value.trim().toLowerCase();
         
         // Check if input is empty
@@ -31,12 +50,14 @@ document.addEventListener('DOMContentLoaded', () => {
             // Error message
             if (newWord[0] !== lastLetter) {
                 errorDisplay.textContent = `Word must start with '${lastLetter}'.`;
+                endGame();
                 return;
             }
         }
         // Check for duplicate words
         if (words.includes(newWord)) {
             errorDisplay.textContent = 'Word already used. Try a different one.';
+            endGame();
             return;
         }
 
@@ -84,4 +105,28 @@ document.addEventListener('DOMContentLoaded', () => {
             leaderboardList.appendChild(li);
         });
     }
+
+    function endGame() {
+        gameOver = true;
+        errorDisplay.textContent += ' Game Over!';
+        wordInput.disabled = true;
+        submitWord.disabled = true;
+
+        // Show the Restart button
+        restartButton.style.display = 'block';
+    }
+
+    // Restart game logic
+    restartButton.addEventListener('click', () => {
+        words = [];
+        gameOver = false;
+        errorDisplay.textContent = '';
+        wordInput.disabled = false;
+        submitWord.disabled = false;
+        wordInput.value = '';
+        updateWordList();
+
+        // Hide the Restart button again
+        restartButton.style.display = 'none';
+    });
 });
