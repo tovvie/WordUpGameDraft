@@ -6,6 +6,9 @@ body {
     height: 100vh;
     margin: 0;
     background-color: #f0f0f0;
+    background-image: url("https://iili.io/dNRnBfe.md.png");
+    background-repeat: repeat;
+    background-size: auto 400px;
 }
 
 .container {
