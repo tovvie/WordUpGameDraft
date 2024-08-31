@@ -29,6 +29,14 @@ document.addEventListener('DOMContentLoaded', () => {
     let wrongAttempts = 0; // Counter for wrong attempts
     const maxWrongAttempts = 3; // Maximum wrong attempts allowed
 
+    let dictionary = {}; // Dictionary to store words from JSON
+
+    fetch('wordsDictionary.json')
+        .then(response => response.json())
+        .then(data => {
+            dictionary = data;
+        });
+
     submitWord.addEventListener('click', () => {
         if (gameOver) return;
 
@@ -36,6 +44,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (!newWord) {
             errorDisplay.textContent = 'Please enter a word.';
+            return;
+        }
+
+        // Check if the word is in the dictionary
+        if (!(newWord in dictionary)) {
+            wrongAttempts++; // Increment wrong attempts
+            errorDisplay.textContent = `Word not found in dictionary. You have ${maxWrongAttempts - wrongAttempts} attempts left.`;
+
+            if (wrongAttempts >= maxWrongAttempts) {
+                endGame();
+            }
             return;
         }
 
