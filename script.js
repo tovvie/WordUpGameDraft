@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     // References to HTML elements
-    const wordInput = document.getElementById('wordInput');
+    const letterContainer = document.querySelector('.letterInputContainer'); // Container for letter input blocks
     const submitWord = document.getElementById('submitWord');
     const wordsList = document.getElementById('words');
     const errorDisplay = document.getElementById('error');
@@ -37,10 +37,64 @@ document.addEventListener('DOMContentLoaded', () => {
             dictionary = data;
         });
 
+    // Create letter input blocks
+    const maxWordLength = 10;
+    createLetterInputs(maxWordLength);
+
+    // Function to dynamically create letter input fields
+    function createLetterInputs(maxLength) {
+        letterContainer.innerHTML = ''; // Clear existing inputs
+        for (let i = 0; i < maxLength; i++) {
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.maxLength = 1; // Allow only one letter per input
+            input.classList.add('letterBlock');
+            input.addEventListener('input', moveToNextInput);
+            input.addEventListener('keydown', handleKeyPress);
+            letterContainer.appendChild(input);
+        }
+    }
+
+    // Move to the next input field when a letter is typed
+    function moveToNextInput(event) {
+        const input = event.target;
+        const nextInput = input.nextElementSibling;
+        if (input.value && nextInput && nextInput.tagName === 'INPUT') {
+            nextInput.focus();
+        }
+    }
+
+    // Handle key presses including Enter and Backspace
+    function handleKeyPress(event) {
+        if (event.key === 'Enter') {
+            event.preventDefault(); 
+            submitWord.click(); // Trigger a click event on the submit button
+        } else if (event.key === 'Backspace') {
+            event.preventDefault();
+            handleBackspace(event);
+        }
+    }
+
+    // Handle Backspace key press
+    function handleBackspace(event) {
+        const input = event.target;
+        const prevInput = input.previousElementSibling;
+
+        // Clear the current input field
+        input.value = '';
+
+        // Move focus to the previous input field if it exists
+        if (prevInput && prevInput.tagName === 'INPUT') {
+            prevInput.focus();
+        }
+    }
+
     submitWord.addEventListener('click', () => {
         if (gameOver) return;
 
-        const newWord = wordInput.value.trim().toLowerCase();
+        const newWord = Array.from(letterContainer.querySelectorAll('input'))
+            .map(input => input.value.trim().toLowerCase())
+            .join('');
 
         if (!newWord) {
             errorDisplay.textContent = 'Please enter a word.';
@@ -51,6 +105,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!(newWord in dictionary)) {
             wrongAttempts++; // Increment wrong attempts
             errorDisplay.textContent = `Word not found in dictionary. You have ${maxWrongAttempts - wrongAttempts} attempts left.`;
+            clearInputs(); // Clear inputs after a failed attempt
 
             if (wrongAttempts >= maxWrongAttempts) {
                 endGame();
@@ -66,6 +121,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (newWord[0] !== lastLetter) {
                 wrongAttempts++; // Increment wrong attempts
                 errorDisplay.textContent = `Word must start with '${lastLetter}'. You have ${maxWrongAttempts - wrongAttempts} attempts left.`;
+                clearInputs(); // Clear inputs after a failed attempt
 
                 if (wrongAttempts >= maxWrongAttempts) {
                     endGame();
@@ -78,6 +134,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (words.includes(newWord)) {
             wrongAttempts++; // Increment wrong attempts
             errorDisplay.textContent = `Word already used. Try a different one. You have ${maxWrongAttempts - wrongAttempts} attempts left.`;
+            clearInputs(); // Clear inputs after a failed attempt
 
             if (wrongAttempts >= maxWrongAttempts) {
                 endGame();
@@ -89,7 +146,7 @@ document.addEventListener('DOMContentLoaded', () => {
         words.push(newWord);
         updateWordList();
         updateLeaderboard(newWord);
-        wordInput.value = '';
+        clearInputs(); // Clear inputs after successful attempt
         errorDisplay.textContent = '';
     });
 
@@ -127,9 +184,18 @@ document.addEventListener('DOMContentLoaded', () => {
     function endGame() {
         gameOver = true;
         errorDisplay.textContent += ' Game Over!';
-        wordInput.disabled = true;
+        letterContainer.querySelectorAll('input').forEach(input => input.disabled = true);
         submitWord.disabled = true;
         restartButton.style.display = 'block';
+    }
+
+    function clearInputs() {
+        letterContainer.querySelectorAll('input').forEach((input, index) => {
+            input.value = '';
+            if (index === 0) {
+                input.focus(); // Focus on the first input box
+            }
+        });
     }
 
     restartButton.addEventListener('click', () => {
@@ -137,10 +203,13 @@ document.addEventListener('DOMContentLoaded', () => {
         gameOver = false;
         wrongAttempts = 0; // Reset wrong attempts
         errorDisplay.textContent = '';
-        wordInput.disabled = false;
+        letterContainer.querySelectorAll('input').forEach(input => {
+            input.disabled = false;
+            input.value = '';
+        });
         submitWord.disabled = false;
-        wordInput.value = '';
         updateWordList();
         restartButton.style.display = 'none';
+        letterContainer.querySelectorAll('input')[0].focus(); // Focus on the first input box
     });
 });
